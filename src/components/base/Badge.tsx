@@ -1,6 +1,6 @@
-import { OrderStatus } from "../../types/order";
+import { OrderStatus, AlertType } from "../../types/order";
 
-// ─── StatusBadge ───────────────────────────────────────────────────────────
+// ─── StatusBadge ─────────────────────────────────────────
 
 interface StatusBadgeProps {
   status: OrderStatus;
@@ -8,29 +8,75 @@ interface StatusBadgeProps {
 }
 
 const statusConfig: Record<OrderStatus, { label: string; classes: string; dot: string }> = {
-  Placed:     { label: "Placed",     classes: "bg-slate-100 text-slate-700 border border-slate-200",      dot: "bg-slate-400" },
-  Accepted:   { label: "Accepted",   classes: "bg-teal-100 text-teal-800 border border-teal-200",         dot: "bg-teal-500" },
-  Preparing:  { label: "Preparing",  classes: "bg-amber-100 text-amber-800 border border-amber-200",      dot: "bg-amber-500" },
-  Ready:      { label: "Ready",      classes: "bg-emerald-100 text-emerald-800 border border-emerald-200",dot: "bg-emerald-500" },
-  PickedUp:   { label: "Picked Up",  classes: "bg-teal-100 text-teal-700 border border-teal-200",         dot: "bg-teal-400" },
-  Delivering: { label: "Delivering", classes: "bg-sky-100 text-sky-800 border border-sky-200",            dot: "bg-sky-500" },
-  Delivered:  { label: "Delivered",  classes: "bg-emerald-100 text-emerald-900 border border-emerald-300",dot: "bg-emerald-600" },
-  Cancelled:  { label: "Cancelled",  classes: "bg-gray-100 text-gray-400 border border-gray-200",         dot: "bg-gray-300" },
+  Placed: {
+    label: "Placed",
+    classes: "bg-slate-50 text-slate-700 border border-slate-200",
+    dot: "bg-slate-400",
+  },
+  Accepted: {
+    label: "Accepted",
+    classes: "bg-teal-50 text-teal-700 border border-teal-200",
+    dot: "bg-teal-500",
+  },
+  Preparing: {
+    label: "Preparing",
+    classes: "bg-amber-50 text-amber-700 border border-amber-200",
+    dot: "bg-amber-500",
+  },
+  Ready: {
+    label: "Ready",
+    classes: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    dot: "bg-emerald-500",
+  },
+  PickedUp: {
+    label: "Picked Up",
+    classes: "bg-cyan-50 text-cyan-700 border border-cyan-200",
+    dot: "bg-cyan-500",
+  },
+  Delivering: {
+    label: "Delivering",
+    classes: "bg-blue-50 text-blue-700 border border-blue-200",
+    dot: "bg-blue-500",
+  },
+  Delivered: {
+    label: "Delivered",
+    classes: "bg-green-50 text-green-700 border border-green-200",
+    dot: "bg-green-600",
+  },
+  Cancelled: {
+    label: "Cancelled",
+    classes: "bg-gray-50 text-gray-400 border border-gray-200 opacity-60",
+    dot: "bg-gray-300",
+  },
 };
 
-export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
+const sizeClassesMap = {
+  sm: "h-6 px-3 text-xs",
+  md: "h-7 px-3.5 text-sm",
+};
+
+export function StatusBadge({ status, size = "sm" }: StatusBadgeProps) {
   const config = statusConfig[status];
-  const sizeClasses = size === "sm" ? "text-xs px-2 py-0.5" : "text-xs px-2.5 py-1";
+
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full font-semibold whitespace-nowrap ${sizeClasses} ${config.classes}`}>
-      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${config.dot} ${status === "Cancelled" ? "opacity-50" : ""}`} />
+    <span
+      className={`
+        inline-flex items-center justify-center
+        min-w-[100px]   /* ⭐ 关键：统一宽度 */
+        ${sizeClassesMap[size]}
+        rounded-full
+        font-semibold
+        whitespace-nowrap
+        ${config.classes}
+      `}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${config.dot}`} />
       {config.label}
     </span>
   );
 }
 
-// ─── PriorityDot ───────────────────────────────────────────────────────────
-// Now driven by isUrgent / isDelayed flags
+// ─── PriorityDot ─────────────────────────────────────────
 
 interface FlagDotProps {
   isUrgent: boolean;
@@ -39,10 +85,10 @@ interface FlagDotProps {
 
 export function FlagDot({ isUrgent, isDelayed }: FlagDotProps) {
   const color = isUrgent ? "bg-red-500" : isDelayed ? "bg-amber-400" : "bg-gray-300";
-  return <span className={`inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 ${color}`} />;
+  return <span className={`inline-block w-2.5 h-2.5 rounded-full ${color}`} />;
 }
 
-// ─── CategoryBadge (kept for legacy dashboard use) ─────────────────────────
+// ─── CategoryBadge ───────────────────────────────────────
 
 type OrderCategory = "room_service" | "housekeeping" | "concierge" | "maintenance";
 
@@ -63,9 +109,7 @@ export function CategoryBadge({ category }: { category: OrderCategory }) {
   );
 }
 
-// ─── AlertTypeBadge ────────────────────────────────────────────────────────
-
-import { AlertType } from "../../types/order";
+// ─── AlertTypeBadge ──────────────────────────────────────
 
 const alertTypeConfig: Record<AlertType, { label: string; icon: string }> = {
   overdue:   { label: "Overdue",   icon: "ri-time-line" },
@@ -86,7 +130,7 @@ export function AlertTypeBadge({ type }: { type: AlertType }) {
   );
 }
 
-// ─── Flag chips row ────────────────────────────────────────────────────────
+// ─── FlagChips ───────────────────────────────────────────
 
 interface FlagChipsProps {
   isUrgent: boolean;
@@ -96,22 +140,23 @@ interface FlagChipsProps {
 }
 
 export function FlagChips({ isUrgent, isDelayed, hasReminder, size = "sm" }: FlagChipsProps) {
-  const base = size === "sm" ? "text-[10px] px-1.5 py-0.5" : "text-xs px-2 py-0.5";
+  const base = size === "sm" ? "h-5 text-[10px] px-2" : "h-6 text-xs px-2.5";
+
   return (
     <div className="flex items-center gap-1 flex-wrap">
       {isUrgent && (
-        <span className={`inline-flex items-center gap-1 rounded-full font-semibold bg-red-100 text-red-700 border border-red-200 ${base}`}>
-          <i className="ri-alarm-warning-fill" /> Urgent
+        <span className={`inline-flex items-center gap-1 rounded-full font-semibold ${base} bg-red-50 text-red-700 border border-red-200`}>
+          <i className="ri-alarm-warning-fill text-[10px]" /> Urgent
         </span>
       )}
       {isDelayed && (
-        <span className={`inline-flex items-center gap-1 rounded-full font-semibold bg-amber-100 text-amber-700 border border-amber-200 ${base}`}>
-          <i className="ri-time-line" /> Delayed
+        <span className={`inline-flex items-center gap-1 rounded-full font-semibold ${base} bg-amber-50 text-amber-700 border border-amber-200`}>
+          <i className="ri-time-line text-[10px]" /> Delayed
         </span>
       )}
       {hasReminder && (
-        <span className={`inline-flex items-center gap-1 rounded-full font-semibold bg-teal-100 text-teal-700 border border-teal-200 ${base}`}>
-          <i className="ri-notification-3-line" /> Reminder
+        <span className={`inline-flex items-center gap-1 rounded-full font-semibold ${base} bg-teal-50 text-teal-700 border border-teal-200`}>
+          <i className="ri-notification-3-line text-[10px]" /> Reminder
         </span>
       )}
     </div>
